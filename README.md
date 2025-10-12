@@ -5,7 +5,7 @@
 
   ![Discord](https://img.shields.io/badge/Discord-Bot-7289da?style=for-the-badge&logo=discord&logoColor=white)
   ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
-  ![Node.js](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+  ![Bun](https://img.shields.io/badge/Bun-000000?style=for-the-badge&logo=bun&logoColor=white)
 </div>
 
 ## ✨ Features
@@ -19,7 +19,7 @@
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js latest 📦
+- Bun latest 📦
 - Discord Bot Token 🔑
 - A Discord server with proper permissions 🏠
 
@@ -31,7 +31,7 @@ git clone https://github.com/iQuickDev/fenbot
 cd fenbot
 
 # Install dependencies
-npm install
+bun install
 
 # Set up environment variables
 cp .env.example .env
@@ -46,14 +46,14 @@ Create a `.env` file with the environment variables contained in the example
 
 ```bash
 # Install the dependencies
-npm install
+bun install
 
 # Development
-npm run dev
+bun run dev
 
 # Production
-npm build
-npm start
+bun run build
+bun start
 ```
 
 ## 🎮 Commands
