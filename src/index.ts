@@ -40,7 +40,7 @@ const spamCount = new Map<string, number>();
 const COOLDOWN_TIME = 15 * 60 * 1000; // 15 minutes
 const SPAM_TIMEOUT = 5 * 60 * 1000; // 5 minutes
 
-client.once('ready', () => {
+client.once('clientReady', () => {
 	log.info(`fenbot is ready as ${client.user?.tag}`);
 });
 
