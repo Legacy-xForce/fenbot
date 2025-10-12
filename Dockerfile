@@ -1,36 +1,39 @@
-FROM node:alpine AS base
-WORKDIR /app
+# # use the official Bun image
+# see all versions at https://hub.docker.com/r/oven/bun/tags
+FROM oven/bun:alpine AS base
+WORKDIR /usr/src/app
 
-FROM base AS prod-deps
-# Copy only manifests first to maximize cache hits
-COPY package*.json ./
-# If you use a private registry, also COPY .npmrc ./
-RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
-    npm ci --omit=dev
+# install dependencies into temp directory
+# this will cache them and speed up future builds
+FROM base AS install
+RUN mkdir -p /temp/dev
+COPY package.json bun.lock /temp/dev/
+RUN cd /temp/dev && bun install --frozen-lockfile
 
-# --- Build stage ---
-FROM base AS build
-COPY package*.json ./
-# If you use a private registry, also COPY .npmrc ./
-RUN --mount=type=cache,id=npm-cache,target=/root/.npm \
-    npm ci
-# Now bring in the rest of the source and build
+# install with --production (exclude devDependencies)
+RUN mkdir -p /temp/prod
+COPY package.json bun.lock /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production
+
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS prerelease
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-RUN npm run build
 
-# --- Runtime image ---
-FROM node:alpine
-WORKDIR /app
+# build the project
 ENV NODE_ENV=production
+RUN bun run build
 
-# Install curl for health checks (optional)
+# copy production dependencies and source code into final image
+FROM base AS release
+COPY --from=install /temp/prod/node_modules node_modules
+COPY --from=prerelease /usr/src/app/ .
+
+# # Install curl for healthcheck
 RUN apk add --no-cache curl
 
-# Bring in runtime deps and build output
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=build /app/dist ./dist
-# Keep package.json so `npm start` works
-COPY package*.json ./
-
-EXPOSE 3000
-CMD ["npm", "start"]
+# run the app
+USER bun
+EXPOSE 3000/tcp
+ENTRYPOINT [ "bun", "start" ]
