@@ -10,7 +10,7 @@ import {
 } from 'discord.js';
 import * as dotenv from 'dotenv';
 import log from 'loglevel';
-import { configureLogger } from './log';
+import { configureLogger } from './log.ts';
 
 dotenv.config();
 configureLogger(log);
